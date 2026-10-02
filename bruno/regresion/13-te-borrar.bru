@@ -1,0 +1,25 @@
+meta {
+  name: 13 TE borrar
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/books/{{flowBookId}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Tecnica: Transicion de estados (actualizado -> borrado)
+  Valor probado: DELETE /books/{{flowBookId}}
+  Resultado esperado: 204 No Content
+}

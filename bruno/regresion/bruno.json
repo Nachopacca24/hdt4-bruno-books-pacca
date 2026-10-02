@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "regresion",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get created book
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/books/{{lastBookId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("id matches lastBookId", function() {
+    expect(res.getBody().id).to.equal(Number(bru.getVar("lastBookId")));
+  });
+}

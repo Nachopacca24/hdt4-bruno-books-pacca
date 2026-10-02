@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "regresion",
+    "_postman_id": "a2000000-0000-4000-8000-000000000002",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 POST /reset - punto de partida",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/reset", "host": ["{{baseUrl}}"], "path": ["reset"] },
+        "description": "Setup. No es un caso de prueba en si, pero deja el estado en los 3 libros semilla antes de correr la suite."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"] } }
+      ]
+    },
+    {
+      "name": "01 EP - POST valido (particion valida)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Refactoring\",\n  \"author\": \"Martin Fowler\",\n  \"year\": 1999,\n  \"copies\": 2\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: particion de equivalencia (clase valida).\nValor probado: title, author, year=1999 y copies=2, todos dentro de rango.\nResultado esperado: 201 con Location, segun la tabla del enunciado."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "pm.test('trae Location', () => pm.response.headers.has('Location'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 EP - POST title vacio (particion invalida)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"\",\n  \"author\": \"X\",\n  \"year\": 2000,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: particion de equivalencia (clase invalida).\nValor probado: title = \"\" (por debajo del minimo de 1 caracter).\nResultado esperado: 422, segun la regla 'title obligatorio, de 1 a 120 caracteres'. Verificado contra el API: devuelve string_too_short."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 422', () => pm.response.to.have.status(422));"] } }
+      ]
+    },
+    {
+      "name": "03 VF - year=1450 (frontera minima valida)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 1450,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: year = 1450, el minimo permitido (ge=1450).\nResultado esperado: 201. Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 201', () => pm.response.to.have.status(201));"] } }
+      ]
+    },
+    {
+      "name": "04 VF - year=1449 (justo debajo de la frontera)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 1449,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: year = 1449, un valor debajo del minimo permitido.\nResultado esperado: 422 (greater_than_equal). Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 422', () => pm.response.to.have.status(422));"] } }
+      ]
+    },
+    {
+      "name": "05 VF - year=2100 (frontera maxima valida)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 2100,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: year = 2100, el maximo permitido (le=2100).\nResultado esperado: 201. Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 201', () => pm.response.to.have.status(201));"] } }
+      ]
+    },
+    {
+      "name": "06 VF - year=2101 (justo arriba de la frontera)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 2101,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: year = 2101, un valor arriba del maximo permitido.\nResultado esperado: 422 (less_than_equal). Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 422', () => pm.response.to.have.status(422));"] } }
+      ]
+    },
+    {
+      "name": "07 VF - copies=1000 (justo arriba de la frontera)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 2000,\n  \"copies\": 1000\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: copies = 1000, un valor arriba del maximo permitido (le=999).\nResultado esperado: 422. Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 422', () => pm.response.to.have.status(422));"] } }
+      ]
+    },
+    {
+      "name": "08 VF - title de 121 caracteres (justo arriba de la frontera)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"author\": \"A\",\n  \"year\": 2000,\n  \"copies\": 1\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: valores frontera.\nValor probado: title con 121 caracteres (verificado con python: len('x'*121)==121), uno arriba del maximo permitido (max_length=120).\nResultado esperado: 422 (string_too_long). Verificado contra el API."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 422', () => pm.response.to.have.status(422));"] } }
+      ]
+    },
+    {
+      "name": "09 TD - POST sin X-API-Key (DEMO_API_KEY activa)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"T\",\n  \"author\": \"A\",\n  \"year\": 2000,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: tabla de decision (condiciones: DEMO_API_KEY definida x header presente).\nValor probado: escritura sin header X-API-Key, con el servidor corriendo con DEMO_API_KEY definida.\nResultado esperado: 401.\nREQUIERE correr el servidor con DEMO_API_KEY=s3cret (o el valor que pongas en la variable apiKey) para que este caso tenga sentido; si el servidor corre sin auth, este request fallaria (devolveria 201)."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"] } }
+      ]
+    },
+    {
+      "name": "10 TD - POST con llave incorrecta y body invalido a la vez",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "llave-equivocada" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"\",\n  \"author\": \"A\",\n  \"year\": 2000,\n  \"copies\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: tabla de decision (condiciones: llave incorrecta x body invalido, ambas fallan a la vez).\nValor probado: X-API-Key incorrecta + title vacio, con DEMO_API_KEY definida en el servidor.\nResultado esperado: 401, no 422. Verificado contra el API: la dependencia de autenticacion se resuelve antes que la validacion del body, asi que la llave incorrecta gana."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 401 (la auth gana sobre la validacion del body)', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 TE - crea el libro del flujo",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Domain-Driven Design\",\n  \"author\": \"Eric Evans\",\n  \"year\": 2003,\n  \"copies\": 2\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+        "description": "Tecnica: transicion de estados. Estado inicial: no existe -> estado 'existe'.\nResultado esperado: 201. Guarda el id en la variable flowBookId para los siguientes 3 requests del flujo."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.environment.set('flowBookId', body.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 TE - PUT actualiza el libro (existe -> actualizado)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"DDD Reference\",\n  \"author\": \"Eric Evans\",\n  \"year\": 2015,\n  \"copies\": 5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/books/{{flowBookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["books", "{{flowBookId}}"]
+        },
+        "description": "Tecnica: transicion de estados. Estado: 'existe' -> 'actualizado' (reemplazo completo).\nResultado esperado: 200 con los campos nuevos."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('el titulo cambio', () => pm.expect(pm.response.json().title).to.eql('DDD Reference'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 TE - DELETE el libro (actualizado -> borrado)",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/books/{{flowBookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["books", "{{flowBookId}}"]
+        },
+        "description": "Tecnica: transicion de estados. Estado: 'actualizado' -> 'borrado'.\nResultado esperado: 204 sin body."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 204', () => pm.response.to.have.status(204));"] } }
+      ]
+    },
+    {
+      "name": "14 TE - GET tras borrar (borrado -> no existe)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/{{flowBookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["books", "{{flowBookId}}"]
+        },
+        "description": "Tecnica: transicion de estados. Estado final: 'borrado', confirma que ya no es accesible.\nResultado esperado: 404."
+      },
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 404', () => pm.response.to.have.status(404));"] } }
+      ]
+    }
+  ]
+}

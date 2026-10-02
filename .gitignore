@@ -1,0 +1,23 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Node / Bruno CLI
+node_modules/
+
+# Reportes generados (bru --reporter-junit, newman)
+*.xml
+api.log
+api.pid
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos comprimidos / exportes
+*.zip

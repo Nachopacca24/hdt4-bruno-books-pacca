@@ -1,0 +1,40 @@
+meta {
+  name: 12 TE actualizar
+  type: http
+  seq: 13
+}
+
+put {
+  url: {{baseUrl}}/books/{{flowBookId}}
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "title": "DDD Reference",
+    "author": "Eric Evans",
+    "year": 2015,
+    "copies": 5
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("title was updated", function() {
+    expect(res.getBody().title).to.equal("DDD Reference");
+  });
+}
+
+docs {
+  Tecnica: Transicion de estados (existe -> actualizado)
+  Valor probado: PUT /books/{{flowBookId}} con title DDD Reference
+  Resultado esperado: 200 OK y title = "DDD Reference"
+}

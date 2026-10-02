@@ -1,0 +1,15 @@
+meta {
+  name: Reset
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/reset
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}

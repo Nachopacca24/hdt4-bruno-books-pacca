@@ -1,0 +1,34 @@
+meta {
+  name: 10 TD llave incorrecta y body invalido
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: llave-equivocada
+}
+
+body:json {
+  {
+    "title": "",
+    "author": "Martin Fowler",
+    "year": 1999,
+    "copies": 2
+  }
+}
+
+assert {
+  res.status: eq 401
+}
+
+docs {
+  Tecnica: Tabla de decision (llave incorrecta x body invalido)
+  Valor probado: X-API-Key = "llave-equivocada" y title = ""
+  Resultado esperado: 401 Unauthorized (la auth gana sobre la validacion del body)
+}

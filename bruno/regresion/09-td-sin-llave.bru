@@ -1,0 +1,30 @@
+meta {
+  name: 09 TD sin X-API-Key
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Refactoring",
+    "author": "Martin Fowler",
+    "year": 1999,
+    "copies": 2
+  }
+}
+
+assert {
+  res.status: eq 401
+}
+
+docs {
+  Tecnica: Tabla de decision (DEMO_API_KEY activa x header ausente)
+  Valor probado: body valido, sin header X-API-Key
+  Resultado esperado: 401 Unauthorized
+}

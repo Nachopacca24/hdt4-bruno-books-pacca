@@ -1,0 +1,23 @@
+meta {
+  name: List books
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/books
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("body is an array of 3 books", function() {
+    const body = res.getBody();
+    expect(body).to.be.an("array");
+    expect(body.length).to.equal(3);
+  });
+}

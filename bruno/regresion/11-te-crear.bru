@@ -1,0 +1,38 @@
+meta {
+  name: 11 TE crear
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "title": "Domain-Driven Design",
+    "author": "Eric Evans",
+    "year": 2003,
+    "copies": 2
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setVar("flowBookId", res.getBody().id);
+}
+
+docs {
+  Tecnica: Transicion de estados (no existe -> existe)
+  Valor probado: POST de un libro valido
+  Resultado esperado: 201 Created; se guarda flowBookId
+}

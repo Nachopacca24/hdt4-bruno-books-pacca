@@ -1,0 +1,40 @@
+meta {
+  name: 01 PE clase valida
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "title": "Refactoring",
+    "author": "Martin Fowler",
+    "year": 1999,
+    "copies": 2
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Location header exists", function() {
+    expect(res.getHeader("location")).to.exist;
+  });
+}
+
+docs {
+  Tecnica: Particion de equivalencia (clase valida)
+  Valor probado: libro completo y valido con X-API-Key correcta
+  Resultado esperado: 201 Created + header Location
+}

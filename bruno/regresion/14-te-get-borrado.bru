@@ -1,0 +1,21 @@
+meta {
+  name: 14 TE get borrado
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/books/{{flowBookId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+}
+
+docs {
+  Tecnica: Transicion de estados (borrado -> no existe)
+  Valor probado: GET /books/{{flowBookId}} despues del DELETE
+  Resultado esperado: 404 Not Found
+}

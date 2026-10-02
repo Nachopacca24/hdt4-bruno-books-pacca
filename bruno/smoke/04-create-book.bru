@@ -1,0 +1,38 @@
+meta {
+  name: Create book
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "title": "Cien anios de soledad",
+    "author": "Gabriel Garcia Marquez",
+    "year": 1967,
+    "copies": 3
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setVar("lastBookId", res.getBody().id);
+}
+
+tests {
+  test("Location header exists", function() {
+    expect(res.getHeader("location")).to.exist;
+  });
+}

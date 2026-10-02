@@ -1,0 +1,91 @@
+{
+  "info": {
+    "_postman_id": "5d050f94-375a-44f3-9347-541695865181",
+    "name": "/smoke",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "reset",
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"], "type": "text/javascript" } }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": { "raw": "http://127.0.0.1:8000/reset", "protocol": "http", "host": ["127","0","0","1"], "port": "8000", "path": ["reset"] }
+      },
+      "response": []
+    },
+    {
+      "name": "health",
+      "event": [
+        { "listen": "test", "script": { "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"], "type": "text/javascript" } }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://127.0.0.1:8000/health", "protocol": "http", "host": ["127","0","0","1"], "port": "8000", "path": ["health"] }
+      },
+      "response": []
+    },
+    {
+      "name": "books",
+      "event": [
+        { "listen": "test", "script": { "exec": [
+          "pm.test('status 200', () => pm.response.to.have.status(200));",
+          "pm.test('hay 3 libros tras el reset', () => {",
+          "  const body = pm.response.json();",
+          "  pm.expect(Array.isArray(body)).to.be.true;",
+          "  pm.expect(body.length).to.eql(3);",
+          "});"
+        ], "type": "text/javascript" } }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://127.0.0.1:8000/books", "protocol": "http", "host": ["127","0","0","1"], "port": "8000", "path": ["books"] }
+      },
+      "response": []
+    },
+    {
+      "name": "crear_libro",
+      "event": [
+        { "listen": "test", "script": { "exec": [
+          "pm.test('status 201', () => pm.response.to.have.status(201));",
+          "pm.test('trae Location', () => pm.response.headers.has('Location'));",
+          "const body = pm.response.json();",
+          "pm.environment.set('lastBookId', body.id);"
+        ], "type": "text/javascript" } }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Cien anios de soledad\",\n  \"author\": \"Gabriel Garcia Marquez\",\n  \"year\": 1967,\n  \"copies\": 3\n}" },
+        "url": { "raw": "http://127.0.0.1:8000/books", "protocol": "http", "host": ["127","0","0","1"], "port": "8000", "path": ["books"] }
+      },
+      "response": []
+    },
+    {
+      "name": "book/id",
+      "event": [
+        { "listen": "test", "script": { "exec": [
+          "pm.test('status 200', () => pm.response.to.have.status(200));",
+          "pm.test('el id coincide', () => {",
+          "  const body = pm.response.json();",
+          "  pm.expect(String(body.id)).to.eql(String(pm.environment.get('lastBookId')));",
+          "});"
+        ], "type": "text/javascript" } }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://127.0.0.1:8000/books/{{lastBookId}}", "protocol": "http", "host": ["127","0","0","1"], "port": "8000", "path": ["books", "{{lastBookId}}"] }
+      },
+      "response": []
+    }
+  ]
+}
